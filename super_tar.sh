@@ -13,6 +13,7 @@ dir_path=${dir_path%%/}
 base_dir=${dir_path%/*}
 dir_name=${dir_path##*/}
 
+cd $cur_path
 tmp_time=$(date "+%Y-%m-%d_%H-%M-%S")
 tmp_cmd="tar -C $base_dir -cvf $dir_name-$tmp_time.tar $dir_name"
 
@@ -22,7 +23,6 @@ endtime=`date +'%Y-%m-%d %H:%M:%S'`
 start_seconds=$(date --date="$starttime" +%s);
 end_seconds=$(date --date="$endtime" +%s);
 
-cd $cur_path
 echo -----------------------------------------------
 echo ${tmp_cmd}
 echo "TimeUsed： "$((end_seconds-start_seconds))"s"
