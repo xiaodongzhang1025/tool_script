@@ -1,6 +1,6 @@
 if [ -z "$1" ] || [ ! -d "$1" ] ; then
   echo "usage:"
-  echo "  $0 dir_path"  
+  echo "  $0 dir_path [clear]"  
   exit -1
 fi
 starttime=`date +'%Y-%m-%d %H:%M:%S'`
@@ -16,6 +16,9 @@ dir_name=${dir_path##*/}
 cd $cur_path
 tmp_time=$(date "+%Y-%m-%d_%H-%M-%S")
 tmp_cmd="tar -C $base_dir -cvf $dir_name-$tmp_time.tar $dir_name"
+if [ "$2" = "clear" ];then
+  tmp_cmd="$tmp_cmd --exclude=*.svn --exclude=*.git --exclude=*.repo"
+fi
 
 $tmp_cmd
 
