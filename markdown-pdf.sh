@@ -2,8 +2,7 @@
 
 if [ -z "$1" ]; then
   echo "para error!!"
-  echo "usage: sudo $0 md_dir_path [template_file_abs_path]"
-  echo "must run with sudo!!!!!!"
+  echo "usage: $0 md_dir_path [template_file_abs_path]"
   exit -1
 fi
 
