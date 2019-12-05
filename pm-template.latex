@@ -1,0 +1,801 @@
+\documentclass[
+$if(fontsize)$
+$fontsize$,
+$else$
+12pt,
+$endif$
+$if(lang)$
+$babel-lang$,
+$endif$
+$if(papersize)$
+$papersize$paper,
+$endif$
+$for(classoption)$
+$classoption$$sep$,
+$endfor$
+]{$if(documentclass)$$documentclass$$else$article$endif$}
+
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+
+  \usepackage[utf8]{inputenc}
+
+\else % if luatex or xelatex
+  \newcommand{\euro}{€}
+
+  \IfFileExists{ctex.sty}{
+     \usepackage{ctex} 		% 分開設置中英文字型
+     \ctexset{today=small}
+  }{
+     \usepackage[BoldFont]{xeCJK} 		% 分開設置中英文字型
+
+     \linespread{1.25}\selectfont 	% 行距
+     \XeTeXlinebreakskip = 0pt plus 1pt % 字與字之間加入0pt至2pt的間距，確保左右對整齊
+     \setlength{\parskip}{10pt} 	% 段落之間的距離
+     \setlength{\parindent}{2.5em}
+
+     \ifxetex
+        \usepackage{xltxtra,xunicode}
+     \fi
+     \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+
+  }
+
+    \CJKsetecglue{ }
+    \xeCJKsetup{PunctStyle=plain}
+$if(CJKmainfont)$
+    \setCJKmainfont[$for(CJKoptions)$$CJKoptions$$sep$,$endfor$]{$CJKmainfont$}
+$else$
+    \IfFontExistsTF{Source Han Serif CN}{
+	\setCJKmainfont{Source Han Serif CN}[
+            UprightFont = *,
+               BoldFont = Source Han Sans CN Bold,
+	]
+     }{
+        %\setCJKmainfont[BoldFont={黑体}]{仿宋}
+     }
+
+    \IfFontExistsTF{Source Han Sans CN}{
+      \setCJKsansfont{Source Han Sans CN}
+    }{}
+$endif$
+
+$if(mainfont)$
+    \setmainfont[$for(mainfontoptions)$$mainfontoptions$$sep$,$endfor$]{$mainfont$}
+$else$
+    \IfFontExistsTF{DejaVu Serif}{
+      \setmainfont{DejaVu Serif} [ 	% 設定英文字型
+           UprightFont = *,
+              BoldFont = * Bold,
+            ItalicFont = * Italic,
+        BoldItalicFont = * Bold Italic,
+         SmallCapsFont = *, %
+      ]
+     }{
+      %\setmainfont[FakeBold=1]{Times New Roman} 	% 設定英文字型
+     }
+$endif$
+
+$if(sansfont)$
+    \setsansfont[$for(sansfontoptions)$$sansfontoptions$$sep$,$endfor$]{$sansfont$}
+$else$
+    \IfFontExistsTF{DejaVu Sans}{
+      \setsansfont{DejaVu Sans}[% main sans
+               UprightFont = *,
+                  BoldFont = * Bold,
+                ItalicFont = * Oblique,
+            BoldItalicFont = * Bold Oblique,
+      %      SmallCapsFont = *, %
+   %     SmallCapsFeatures = {Letters = SmallCaps},
+      ]
+    }
+$endif$
+
+$if(monofont)$
+    \setmonofont[Mapping=tex-ansi$if(monofontoptions)$,$for(monofontoptions)$$monofontoptions$$sep$,$endfor$$endif$]{$monofont$}
+$else$
+    \IfFontExistsTF{DejaVu Sans Mono}{
+      \setmonofont{DejaVu Sans Mono}[
+            UprightFont = *,
+               BoldFont = * Bold,
+             ItalicFont = * Oblique,
+         BoldItalicFont = * Bold Oblique,
+      ]
+    }{
+       %\setmonofont{Times New Roman}
+    }
+$endif$
+
+$if(mathfont)$
+    \setmathfont(Digits,Latin,Greek)[$for(mathfontoptions)$$mathfontoptions$$sep$,$endfor$]{$mathfont$}
+$endif$
+
+$if(romanfont)$
+$else$
+   \setromanfont{Times New Roman} 	% 字型
+$endif$
+\fi
+
+%
+% Set then table layout
+%
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$else$
+\usepackage[
+  a4paper,
+  ignoremp,
+  hoffset=0pt,
+  voffset=0pt,
+  layoutoffset={0pt,0pt},
+  includehead=true,
+  includefoot=true,
+  top=15mm,
+  bottom=15mm,
+  inner=1in,
+  outer=1in,
+  headheight=3ex,
+  footskip=35pt,
+  headsep=2mm,]{geometry}
+$endif$
+
+\usepackage{mathpazo}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage{booktabs}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage[export]{adjustbox}
+
+% for color tables
+\usepackage{float}
+\usepackage{colortbl}
+\definecolor{tableheadercolor}{rgb}{1.0, 1.0, 0.6}
+
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1 @{}}#2\end{tabular}}
+
+\usepackage[T1]{fontenc}
+\usepackage{fontspec} 	% 允許設定字體
+\usepackage{textcomp}
+
+$if(fontfamily)$
+\usepackage[$for(fontfamilyoptions)$$fontfamilyoptions$$sep$,$endfor$]{$fontfamily$}
+$else$
+\usepackage{lmodern}
+$endif$
+
+\usepackage{amssymb,amsmath}
+
+\usepackage[explicit]{titlesec}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{enumitem}
+
+%set the picture format
+\usepackage[export]{adjustbox}
+\usepackage{graphicx}
+
+\usepackage{float}
+\usepackage{fancybox}
+
+\usepackage{eso-pic}
+
+\usepackage{atbegshi}
+
+\makeatletter
+
+\setcounter{section}{0}
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{0}
+$endif$
+
+%列表符号
+\setlist[itemize]{labelindent=\parindent, leftmargin=*, itemsep=-0.2pt, label=$$\bullet$$}%
+\setlist[enumerate]{labelindent=\parindent, leftmargin=*, itemsep=-0.2pt }%
+\setlist[description]{style=nextline, labelwidth=0pt, leftmargin=* }%
+
+\renewcommand{\labelitemi}{\Large$$\bullet$$}%
+\renewcommand{\labelitemii}{\large\textbf{$$\mathbf{\circ}$$}}
+\renewcommand{\labelitemiii}{\normalsize$$\mathbf{\diamond}$$}
+\renewcommand{\labelitemiv}{\normalsize\textbf$$\bigast$$}
+
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}%
+
+\renewcommand{\contentsname}{\hfill\bfseries 目$$\quad$$录 \hfill}
+\renewcommand{\listtablename}{\hfill\bfseries 表目录 \hfill}
+\renewcommand{\listfigurename}{\hfill\bfseries 图目录 \hfill}
+
+\renewcommand*\figurename{图}
+\renewcommand{\thefigure}{%
+   \thesection-\arabic{figure}%
+}
+\@addtoreset{figure}{section}
+
+\renewcommand*\tablename{表}
+\renewcommand{\thetable}{%
+   \thesection-\arabic{table}%
+}
+\@addtoreset{table}{section}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesection.\thesubsection.\arabic{subsubsection}}
+
+\titleformat{\section}[block]{\LARGE}
+   {
+     \vspace*{-1.5\baselineskip}
+     \begin{flushleft}
+     \begin{tikzpicture}[baseline={([yshift=-.6ex]current bounding box.south)}, anchor=east]
+   	\node[fill=gray!70, rectangle,text=white,
+	         outer sep=0pt, scale=1.2](secn){\LARGE\thesection};
+	\node[outer sep=0pt, scale=1.2, right=2pt, 
+                 baseline=(secn.base)](secm) at (secn.east) {\LARGE\color{gray!80}#1 
+		 };
+        \draw[line width=1.5pt, color=gray!70] ($$(secn.south west)+(0, -2pt)$$) -- ++(\textwidth, 0);
+     \end{tikzpicture}
+     \end{flushleft}
+   }
+   {0pt}
+   {\marksection{#1}}
+   [\vspace*{-1\baselineskip}]
+
+\titleformat{name=\section,numberless}[display]{\LARGE}{}{0pt}{#1}
+
+
+\titleformat{\subsection}[block]{\LARGE}{\thesubsection}{0.5em}{#1}
+\titleformat{\subsubsection}[block]{\Large}{\thesubsubsection}{0.5em}{#1}
+\titleformat{\paragraph}{\large\bfseries}{\theparagraph}{1em}{#1}
+%\titleformat{\subparagraph}{\normalsize}
+
+\let\stdl@section\l@section
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.3em}}
+
+\let\stdl@subsection\l@subsection
+\renewcommand*\l@subsection{\@dottedtocline{2}{2.8em}{3.2em}}
+
+\let\stdl@subsubsection\l@subsubsection
+\renewcommand*\l@subsubsection{\@dottedtocline{3}{4.0em}{4.1em}}
+
+\let\stdl@paragraph\l@paragraph
+\renewcommand*\l@paragraph{\@dottedtocline{4}{5em}{5em}}
+
+\let\stdl@subparagraph\l@subparagraph
+\renewcommand*\l@subparagraph{\@dottedtocline{5}{6em}{6em}}
+
+\let\stdl@table\l@table
+\renewcommand*\l@table{\@dottedtocline{0}{1em}{2.3em}}
+
+\let\stdl@figure\l@figure
+\renewcommand*\l@figure{\@dottedtocline{0}{1em}{2.3em}}
+
+
+
+\def\beginDraw{
+       \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+       }
+\def\endDraw{
+}
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+
+\let\origfig\figure
+\let\origendfig\endfigure
+\renewenvironment{figure}[1][]{%
+	\origfig[H]
+}{%
+	\origendfig
+}
+\makeatother
+
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+$if(figdir)$
+\graphicspath{$for(figdir)${"$figdir$/"}$endfor$}
+\makeatletter
+\providecommand*{\input@path}{}
+\edef\input@path{$for(figdir)${"$figdir$/"}$endfor$\input@path}
+\makeatother
+$endif$
+
+%Color 颜色
+\usepackage{xcolor}
+\definecolor{ultramarine}{RGB}{0,32,96}
+
+$if(euro)$
+  \usepackage{eurosym}
+$endif$
+
+\usepackage{listings}
+
+\lstdefinestyle{customc}{
+	belowcaptionskip=1.2\baselineskip,
+	columns=[l]fullflexible,
+	%prebreak=\raisbox{0ex}[0ex][0ex]{},
+	%postbreak=\raisebox{0ex}[0ex][0ex]{\textcolor{red}{$$\hookrightarrow$$}},
+	lineskip=0pt,
+	breaklines=true,
+	frame=single,
+	frameround=tttt,
+	keepspaces=true,
+	language=C++,
+	%keywordstyle=\bfseries\color{green!40!black},
+	commentstyle=\itshape\color{purple!40!black},
+	%identifierstyle=\color{blue},
+	%stringstyle=\color{red},
+	backgroundcolor=\color{gray!10}, % set backgroundcolor
+	basicstyle=\selectfont\linespread{1.2}\footnotesize,
+	%numbers=left,
+	%numberstyle=\footnotesize,
+	showspaces=false,
+	showstringspaces=false,
+	tabsize=2,
+	xleftmargin=5pt,
+	xrightmargin=3pt,
+	aboveskip=20pt,
+	rulecolor=\color{black},
+	extendedchars=false,
+}
+
+\lstset { %
+	style=customc
+}
+
+$if(natbib)$
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+$endif$
+$if(biblatex)$
+\usepackage{biblatex}
+$if(biblio-files)$
+\bibliography{$biblio-files$}
+$endif$
+$endif$
+%$if(listings)$
+%\usepackage{listings}
+%$endif$
+$if(lhs)$
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
+$endif$
+
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
+
+%$if(verbatim-in-note)$
+%\VerbatimFootnotes % allows verbatim text in footnotes
+%$endif$
+
+\usepackage{verbatim}
+\usepackage{varwidth}
+
+\makeatletter
+\def\verbatim@font{\linespread{1}\small\ttfamily\hyphenchar\font\m@ne\@noligs}
+\preto{\@verbatim}{\topsep=0pt \partopsep=0pt \parskip=0pt}
+
+\let\oldv\verbatim
+\let\oldendv\endverbatim
+\makeatother
+
+\def\verbatim{
+   \def\@xobeysp{\ }\oldv\rightskip=0pt plus 6em\relax
+   %\def\@xobeysp{\hspace{0pt}\mbox{ }\hspace{0pt}}\oldv
+}
+\def\endverbatim{
+    \oldendv
+}
+
+\tcbuselibrary{listings}
+\tcbuselibrary{xparse}
+
+\renewtcblisting{verbatim}{%
+	left=0mm, right=0mm, top=0mm, bottom=0mm, boxsep=0mm, middle=0mm,
+	before=, enhanced jigsaw, breakable, drop fuzzy shadow,
+	colback=green!5!white, colframe=black, listing only,
+	listing options={
+		aboveskip=0pt, belowskip=0pt, backgroundcolor=, frameround=, frame=no,
+		belowcaptionskip=0pt, abovecaptionskip=0pt}}
+
+\renewtcblisting{lstlisting}{%
+	left=0mm, right=0mm, top=0mm, bottom=0mm, boxsep=0mm, middle=0mm,
+	enhanced, breakable, drop fuzzy shadow, fit fontsize macros,
+	colback=green!5!white, colframe=black, listing only,
+	listing options={breakautoindent=true, keepspaces=true, extendedchars=false,
+	backgroundcolor=, frameround=, frame=no, breaklines=true, columns=flexible, belowskip=3pt, aboveskip=3pt}}
+
+
+\let\oldquote\quote
+\let\oldendquote\endquote
+\renewenvironment{quote}[1][]{%
+    \tcolorbox[enhanced, breakable, frame hidden, boxrule=0pt,  boxsep=2pt,
+	left=4pt, right=4pt, leftrule=0mm, rightrule=0mm, left skip=\the\parindent,
+	right skip=\the\parindent, sharp corners,borderline west={2.5pt}{0pt}{blue!50},
+	listing only,
+        listing options={columns=fullflexible,breaklines,breakatwhitespace}]
+}{
+    \endtcolorbox
+}
+
+\usepackage{filecontents}
+
+%
+%\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{longtable}
+
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+
+\def\awcopyright{
+	\begin{tabular}[b]{c}%
+		全志科技版权所有,侵权必究 \\
+		Copyright \hspace*{1pt} \copyright \hspace*{1pt} \the\year \hspace*{1pt} by Allwinner. All rights reserved
+	\end{tabular}%
+}
+
+\fancyhf{}
+
+\fancyfoot[C]{%
+	\scriptsize
+	\awcopyright
+}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+
+\hypersetup{
+$if(title-meta)$
+            pdftitle={$title-meta$},
+$endif$
+$if(author-meta)$
+            pdfauthor={$author-meta$},
+$endif$
+$if(keywords)$
+            pdfkeywords={$for(keywords)$$keywords$$sep$; $endfor$},
+$endif$
+$if(colorlinks)$
+            colorlinks=true,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$Maroon$endif$,
+            citecolor=$if(citecolor)$$citecolor$$else$Blue$endif$,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$Blue$endif$,
+$else$
+            pdfborder={0 0 0},
+$endif$
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+
+$if(links-as-notes)$
+% Make links footnotes instead of hotlinks:
+\renewcommand{\href}[2]{#2\footnote{\url{#1}}}
+$endif$
+
+$if(strikeout)$
+\usepackage[normalem]{ulem}
+% avoid problems with \sout in headers with hyperref:
+\pdfstringdefDisableCommands{\renewcommand{\sout}{}}
+$endif$
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+
+\usepackage{titling}
+\setlength{\droptitle}{-8em} 	% 將標題移動至頁面的上面
+
+\newenvironment{centerverbatim}{
+	\par
+	\centering
+	\varwidth{\linewidth}
+	\verbatim
+}{
+	\endverbatim
+	\endvarwidth
+	\par
+}
+
+\renewcommand{\linethickness}{0.00em}
+
+\usepackage{array}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+
+$if(lang)$
+\ifxetex
+  \usepackage{polyglossia}
+  \setmainlanguage{$mainlang$}
+\else
+  \usepackage[$lang$]{babel}
+\fi
+$endif$
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\makeatletter
+\def\vrsion#1{\gdef\@vrsion{#1}}
+\def\@vrsion{\empty}
+
+\def\marksection#1{\gdef\cursecname{#1}}
+\def\cursecname{\empty}
+\makeatother
+
+$if(docver)$
+\vrsion{$docver$}%
+$else$
+$if(changelog)$
+  $for(changelog)$
+    $if(changelog.ver)$\vrsion{\uppercase{$changelog.ver$}}$endif$
+  $endfor$
+$endif$
+$endif$
+
+$if(title)$
+\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+$else$
+\title{}
+$endif$
+
+\makeatletter
+\providecommand\subtitle[1]{\renewcommand\@subtitle{#1}}
+\providecommand\@subtitle{\empty}
+\makeatother
+%\providecommand{\subtitle}[1]{}
+$if(subtitle)$
+\subtitle{$subtitle$}
+$endif$
+$if(author)$
+\author{$for(author)$$author$$sep$ \and $endfor$}
+$endif$
+$if(institute)$
+\institute{$for(institute)$$institute$$sep$ \and $endfor$}
+$endif$
+\date{$if(date)$$date$$else$\today$endif$}
+
+
+\newif\ifdismark
+\gdef\WatermarkDiscard{
+   \global\dismarktrue
+}
+
+$if(watermark)${
+\AtBeginShipout{%
+  \ifdismark%
+    \relax
+  \else
+     \setbox\AtBeginShipoutBox\vbox{%
+        \ifhbox\AtBeginShipoutBox%
+          \unhcopy\AtBeginShipoutBox
+        \else
+          \ifvbox\AtBeginShipoutBox%
+            \unvcopy\AtBeginShipoutBox
+          \fi
+        \fi
+        \begin{tikzpicture}[remember picture,overlay]
+        \IfFileExists{$watermark$}{
+          \node[rotate=30,opacity=0.5]
+            at (current page.center) {%
+              \includegraphics[width=.8\textwidth,height=.8\textheight]{$watermark$}
+            }
+        }{
+          \node[text=gray!50,rotate=45,scale=6,opacity=0.5]
+            at (current page.center) {$watermark$}
+        };%
+        \end{tikzpicture}
+     }
+  \fi
+  \global\dismarkfalse
+}
+}$endif$
+
+\def\AWLOGO{$if(figdir)$AWLOGO.png$else$document-config/templates/AWLOGO.png$endif$}
+
+%\usepackage{tikz-timing}
+%
+%\tikzset{timing/.cd, xunit=3.5ex, yunit=3.5ex,
+%  e/.style={red,dotted},
+%  e/background/.style={fill=gray},
+%}
+
+%\tikztimingmetachar{K}{O{D !{coordinate (sn)}}{!{%
+%	coordinate(save);
+%	\def\cpath{
+%		++(0,0) foreach \x in {0,1}{%
+%			-- ++($${(-1)^\x}*(.1,.1)$$)
+%			-- ++($${(-1)^\x}*(.3,1)$$)
+%			-- ++($${(-1)^\x}*(.1,.1)$$)
+%			-- ++($${(-1)^\x}*(.5,0)$$)
+%		}
+%	}
+%	\begin{scope}
+%		\clip ($$(save |- 0,-.1)$$) \cpath;
+%		\fill [fill=white] ($$(save |- 0,-.1)$$) rectangle +(1,1.2);
+%	\end{scope}
+%	\draw ($$(save |- 0,0)+(0,-.1)$$) \cpath coordinate(end);
+%	\draw (sn) ++(0,0)
+%}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%            Begin to layout the context of documents.      %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\makeatletter
+$if(titlepage)$
+\begin{titlepage}
+  \raggedleft
+  \includegraphics[keepaspectratio=true, width=.5\textwidth]{\AWLOGO}
+
+  \raggedright
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \node[right=0pt, anchor=base west] (maintitle) at (\parindent, 0 |- current page.west) {
+	    \scalebox{1.15}{$$\mathbf{\textbf{\huge\@title}}$$}
+	};
+    \node(subtitle)[below=0cm, anchor=north west] at ($$(0, -.1\baselineskip) + (maintitle.south west)$$) {\large{}\@subtitle\hspace{1pt}};
+    \node(ver/date)[below=0cm, anchor=north west] at ($$(0, -7\baselineskip) + (maintitle.south west)$$) {
+      \begin{tabular}[!h]{rl}
+	 \large\textbf{文档版本号:} & \textbf{\@vrsion} \\[1.2\baselineskip]
+         \large\textbf{发布日期:} & \textbf{\@date} \\
+      \end{tabular}
+    };
+  \end{tikzpicture}
+
+  \ifx \@title \empty
+    \gdef\titlemark{\relax}
+  \else
+    \xdef\titlemark{\@title}
+  \fi
+
+  \WatermarkDiscard
+
+  \normalsize
+  $if(secret)$
+  $else$
+    \include{statement}
+  $endif$
+\end{titlepage}
+$endif$
+\makeatother
+
+\fancyhf{}
+
+\fancyhead[L]{%
+  \setlength{\unitlength}{1pt}
+  \begin{picture}(50,5)(0,0)
+    \put(0,0){\includegraphics[keepaspectratio=true,width=50pt]{\AWLOGO}}
+  \end{picture}
+  \hspace{1pt}
+  \scriptsize
+  \titlemark
+   %\ifempty \titlemark \else \titlemark \fi
+}
+
+\fancyfoot[C]{%
+	\scriptsize
+	\awcopyright
+}
+
+%%%% New page to mark the log.
+\begin{center}
+\begin{table}[!h]
+   \centering
+   \captionsetup{font=Large}
+   \caption*{文档履历}
+   \begin{longtable}{|c
+   	|>{\centering}p{.15\textwidth}
+           |>{\centering}p{.2\textwidth}
+           |>{\raggedright}p{.4\textwidth}|}%
+    \hline
+    版本号 & 日期 & 制/修订人 & 内容描述 \tabularnewline
+    \hline
+    $if(changelog)$
+     $for(changelog)$
+      $if(changelog.ver)$
+      \uppercase{$changelog.ver$}
+      \vrsion{\uppercase{$changelog.ver$}}
+      $endif$ &
+       $if(changelog.date)$$changelog.date$$endif$ &
+       $if(changelog.author)$$changelog.author$$endif$ &
+       $if(changelog.desc)$$changelog.desc$$endif$ \tabularnewline
+    \hline
+     $endfor$
+    $endif$
+     &  &  & \tabularnewline
+    \hline
+   \end{longtable}
+\end{table}
+\end{center}
+
+\newpage
+
+\pagenumbering{gobble}
+$for(include-before)$
+$include-before$
+$endfor$
+
+$if(toc)$
+{
+  \fancyhead[R]{%
+     \scriptsize
+     $if(secret)$
+       秘密$$\blacktriangle$$\hspace{1pt} 5 \hspace{1pt}年
+     $else$
+       目$$\quad$$录
+     $endif$
+  }
+  \hypersetup{linkcolor=black}
+  \setcounter{tocdepth}{$toc-depth$}
+  \pagenumbering{roman}
+  \tableofcontents
+
+  \newpage
+
+  \linespread{1}\selectfont 	% 行距
+  \listoftables
+
+  \newpage
+
+  \listoffigures
+
+  \newpage
+}
+$endif$
+
+\pagenumbering{arabic}
+
+\fancyhead[R]{%
+   \scriptsize
+   $if(secret)$
+     秘密$$\blacktriangle$$\hspace{1pt} 5 \hspace{1pt}年
+   $else$
+     \cursecname
+   $endif$
+}
+
+\fancyfoot[R]{\scriptsize Page \hspace{1pt} \thepage \hspace{1pt} of \hspace{1pt} \pageref*{LastPage}}
+
+%标题自动换页
+%\newcommand{\sectionbreak}{\clearpage}
+\let\stdsection\section
+\renewcommand\section{\clearpage\stdsection}
+
+$body$
+
+$if(natbib)$
+$if(biblio-files)$
+$if(biblio-title)$
+$if(book-class)$
+\renewcommand\bibname{$biblio-title$}
+$else$
+\renewcommand\refname{$biblio-title$}
+$endif$
+$endif$
+\bibliography{$biblio-files$}
+
+$endif$
+$endif$
+$if(biblatex)$
+\printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+
+$endif$
+$for(include-after)$
+$include-after$
+
+$endfor$
+\end{document}
