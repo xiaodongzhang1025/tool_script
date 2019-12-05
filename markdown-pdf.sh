@@ -22,9 +22,10 @@ if [ ! -z "$template_file_path" ];then
     echo "$2 must be template file path, not dir path!!"
     exit -1
   fi
+  template_file_path=$(readlink -f "$template_file_path")
+  echo -e "\033[42m template file: $template_file_path \033[0m"
 fi
-template_file_path=$(readlink -f "$template_file_path")
-echo -e "\033[42m template file: $template_file_path \033[0m"
+
 cur_path=$(pwd)
 md_files=$(find "$1" -name *.md)
 
@@ -45,7 +46,7 @@ do
   if [ -z "$template_file_path" ];then
     pandoc  $file_name -o $file_name_no_ext.pdf -V mainfont="黑体" --latex-engine=xelatex
   else
-    pandoc  $file_name -o $file_name_no_ext.pdf --latex-engine=xelatex --toc --smart --template="$template_file_path" 
+    pandoc  $file_name -o $file_name_no_ext.pdf --latex-engine=xelatex --toc --smart --template="$template_file_path" -V mainfont="黑体" 
   fi
   if [ "$?" == "0" ];then
     echo -e "\033[32m ===> $base_dir/$file_name_no_ext.pdf \033[0m"
