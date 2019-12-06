@@ -11,6 +11,14 @@ if [ ! -d "$1" ];then
   exit -1
 fi
 
+sys_type=$(uname -a|grep Linux -i)
+if [ -z "$sys_type" ];then
+  sys_type=Windows
+else
+  sys_type=Linux
+fi
+echo $sys_type
+
 template_file_path=$2
 if [ ! -z "$template_file_path" ];then
   if [ ! -e "$template_file_path" ];then 
@@ -40,17 +48,27 @@ do
   #echo $file_name_no_ext
   
   cd $cur_path
+  cp document-config -r $base_dir/
   cd $base_dir
 
   if [ -z "$template_file_path" ];then
-    pandoc  $file_name -o $file_name_no_ext.pdf -V mainfont="黑体" --latex-engine=xelatex
+    if [ "$sys_type" == "Linux" ];then
+      pandoc  $file_name -o $file_name_no_ext.pdf -V mainfont="黑体" --latex-engine=xelatex
+    else
+      pandoc  $file_name -o $file_name_no_ext.pdf -V mainfont="黑体" --pdf-engine=xelatex
+    fi
   else
-    pandoc  $file_name -o $file_name_no_ext.pdf --latex-engine=xelatex --toc --smart --template="$template_file_path" -V mainfont="黑体" 
+    if [ "$sys_type" == "Linux" ];then
+      pandoc  $file_name -o $file_name_no_ext.pdf --latex-engine=xelatex --toc --smart --template="$template_file_path" #-V mainfont="黑体" 
+    else
+      pandoc  $file_name -o $file_name_no_ext.pdf --pdf-engine=xelatex --toc --template="$template_file_path"
+    fi
   fi
   if [ "$?" == "0" ];then
     echo -e "\033[32m ===> $base_dir/$file_name_no_ext.pdf \033[0m"
   else
     echo -e "\033[31m ===> $base_dir/$file_name_no_ext.pdf \033[0m"
+    exit -1
   fi
 done
 
