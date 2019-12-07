@@ -8,7 +8,8 @@ import shutil
 from win32com.client import Dispatch, constants, gencache
 import win32print
 import win32api
-
+reload(sys)
+sys.setdefaultencoding('utf8')
     
 def headfoot_docx(src_docx_path, template_docx_path, dst_docx_path):
     #word_app = Dispatch("Word.Application")
@@ -61,7 +62,7 @@ def headfoot_docx(src_docx_path, template_docx_path, dst_docx_path):
         print str(err).decode("string_escape")
     finally:
         word_app.Quit(constants.wdDoNotSaveChanges)
-        print '===>', dst_docx_path
+        print '===>', dst_docx_path.decode('gbk')
 
 if "__main__" == __name__:
     if len(sys.argv) < 3:
@@ -83,7 +84,7 @@ if "__main__" == __name__:
             if ext == '.docx' or ext == '.doc':
                 if tmp_path.endswith('_QgHeadFoot'):
                     continue
-                print '\n-----------------------', file_path
+                print '\n-----------------------', file_path.decode('gbk')
                 headfoot_docx(file_path, template_path, tmp_path + '_QgHeadFoot' + ext)
 
     print '\n------------------------------The   End-----------------------------'

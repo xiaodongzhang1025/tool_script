@@ -8,7 +8,8 @@ import shutil
 from win32com.client import Dispatch, constants, gencache
 import win32print
 import win32api
-
+reload(sys)
+sys.setdefaultencoding('utf8')
     
 def merge_docx(src1_docx_path, src2_docx_path, dst_docx_path):
     #word_app = Dispatch("Word.Application")
@@ -21,10 +22,11 @@ def merge_docx(src1_docx_path, src2_docx_path, dst_docx_path):
         output.SaveAs(dst_docx_path)
         output.Close()
     except Exception, err:
-        print err
+        #print err
+        print str(err).decode("string_escape")
     finally:
         word_app.Quit(constants.wdDoNotSaveChanges)
-        print '===>', dst_docx_path
+        print '===>', dst_docx_path.decode('gbk')
 
 if "__main__" == __name__:
     if len(sys.argv) < 3:
@@ -46,7 +48,7 @@ if "__main__" == __name__:
             if ext == '.docx' or ext == '.doc':
                 if tmp_path.endswith('_QgCover'):
                     continue
-                print '\n-----------------------', file_path
+                print '\n-----------------------', file_path.decode('gbk')
                 merge_docx(template_path, file_path, tmp_path + '_QgCover' + ext)
 
     print '\n------------------------------The   End-----------------------------'

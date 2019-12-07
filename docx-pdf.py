@@ -8,6 +8,8 @@ import shutil
 from win32com.client import Dispatch, constants, gencache
 import win32print
 import win32api
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 def docx_pdf(docx_path, pdf_path):
     #word_app = Dispatch("Word.Application")
@@ -18,11 +20,11 @@ def docx_pdf(docx_path, pdf_path):
                                 Item=constants.wdExportDocumentWithMarkup,\
                                 CreateBookmarks=constants.wdExportCreateHeadingBookmarks)
     except Exception, err:
-        print err
+        #print err
+        print str(err).decode("string_escape")
     finally:
         word_app.Quit(constants.wdDoNotSaveChanges)
-        print '===>', pdf_path
-    
+        print '===>', pdf_path.decode('gbk')
 
 if "__main__" == __name__:
     if len(sys.argv) < 2:
@@ -39,7 +41,7 @@ if "__main__" == __name__:
             file_path = os.path.join(root, file)
             tmp_path, ext = os.path.splitext(file_path)
             if ext == '.docx' or ext == '.doc':
-                print '\n-----------------------', file_path
+                print '\n-----------------------', file_path.decode('gbk')
                 docx_pdf(file_path, tmp_path + '.pdf')
 
     print '\n------------------------------The   End-----------------------------'
