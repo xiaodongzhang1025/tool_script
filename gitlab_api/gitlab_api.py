@@ -449,6 +449,9 @@ if "__main__" == __name__:
         for i, subElementObj in enumerate(subElementObjs):
             project_name = subElementObj.getAttribute("name")
             project_path = subElementObj.getAttribute("path")
+            
+            ##manifest.xml
+            project_name = project_path
             print 'project info:', project_name, project_path
             super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
     except Exception, err:
