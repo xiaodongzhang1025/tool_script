@@ -92,7 +92,7 @@ def delete_group_by_name_path(git_lab, group_name, group_path, father_group_id =
     finally:
         #print '===> Finally'
         if delete_flag:
-            time.sleep(1)
+            time.sleep(2)
         return delete_flag
         
 ########################## better not use this function
@@ -114,7 +114,7 @@ def delete_project_by_id(git_lab, project_id):
     finally:
         #print '===> Finally'
         if delete_flag:
-            time.sleep(1)
+            time.sleep(2)
         return delete_flag
         
 ########################## better not use this function
@@ -142,7 +142,7 @@ def delete_project_by_name_path(git_lab, project_name, project_path, father_grou
     finally:
         #print '===> Finally'
         if delete_flag:
-            time.sleep(1)
+            time.sleep(2)
         return delete_flag
         
         
@@ -386,7 +386,7 @@ def create_group(git_lab, group_name, group_path, group_desc, father_group_id = 
         print str(err).decode("string_escape")
     finally:
         #print '===> Finally'
-        time.sleep(1)
+        time.sleep(2)
         return group_id
         
 def create_project(git_lab, project_name, project_path, project_desc, father_group_id = None):
@@ -412,7 +412,7 @@ def create_project(git_lab, project_name, project_path, project_desc, father_gro
         print str(err).decode("string_escape")
     finally:
         #print '===> Finally'
-        time.sleep(1)
+        time.sleep(2)
         return project_id
         
 if "__main__" == __name__:
