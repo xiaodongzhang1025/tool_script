@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+
+  <remote  name="loki"
+	  fetch="." />
+
+  <default revision="v2101-ipc"
+           remote="loki"
+           sync-j="4" />
+
+  <project path="build" name="build" groups="loki" >
+    <copyfile src="top_main.mk" dest="Makefile" />
+    <copyfile src="rules.mk" dest="rules.mk" />
+  </project>
+  <project path="config" name="config" groups="loki" >
+    <copyfile src="top_config.in" dest="Config.in" />
+  </project>
+  <project path="dl" name="dl" groups="loki" />
+  <project path="docs" name="docs" groups="loki" />
+  <project path="lichee/brandy-2.0/tools" name="lichee/brandy-2.0/tools" revision="v2101-ipc" >
+    <copyfile src="./build.sh" dest="lichee/brandy-2.0/build.sh" />
+  </project>
+  <project path="lichee/brandy-2.0/u-boot-2018" name="lichee/brandy-2.0/u-boot-2018" revision="v2101-ipc" />
+
+    <project path="lichee/linux-4.9" name="lichee/linux-4.9" revision="v2101-ipc" />
+  <project path="package" name="package" groups="loki" />
+  <project path="scripts" name="scripts" groups="loki" />
+  <project path="target" name="target" groups="loki" />
+  <project path="toolchain" name="toolchain" groups="loki" />
+  <project path="prebuilt" name="prebuilt" groups="loki" />
+  <project path="tools" name="tools" groups="loki" />
+  <project path="softqg/eyesee-mpp/external" name="softQG/eyesee-mpp/external" groups="loki" />
+  <project path="softqg/eyesee-mpp/system/public" name="softQG/eyesee-mpp/system/public" groups="loki" />
+  <project path="softqg/eyesee-mpp/middleware/v2101" name="softQG/eyesee-mpp/middleware/v2101" revision="v2101-ipc" />
+  <project path="softqg/eyesee-mpp/framework/v2101" name="softQG/eyesee-mpp/framework/v2101" revision="v2101-ipc" />
+  <project path="softqg/minigui" name="softQG/minigui" revision="v2101-ipc" />
+  <project path="softqg/awsystrace" name="softQG/awsystrace" groups="loki" />
+  <project path="device/config/common" name="device/config/common" revision="v2101-ipc" />
+  <project path="device/config/rootfs_tar" name="device/config/rootfs_tar" revision="v2101-ipc" />
+  <project path="device/config/chips/v2101" name="device/config/chips/v2101" revision="v2101-ipc" />
+
+</manifest>
