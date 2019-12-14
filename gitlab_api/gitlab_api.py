@@ -415,45 +415,120 @@ def create_project(git_lab, project_name, project_path, project_desc, father_gro
         time.sleep(2)
         return project_id
         
+        
+def update_project_emails_onpush_list(git_lab, project_id):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    try:
+        emails = ''
+        project = git_lab.projects.get(project_id)
+        if project:
+            print function_name, 'find the project [%d]'%project.id
+            project_services = project.services
+            #print dir(project_services)
+            #print project_services
+            if project_services:
+                print '    service [Emails on push]===>'
+                service = project_services.get('emails-on-push')
+
+                attributes = service.attributes
+                #properties = attributes['properties']
+                properties = service.properties
+
+                members = project.members.all(all=True)
+                for member in members:
+                    #print member
+                    #print dir(member)
+                    user = git_lab.users.get(member.id)
+                    print '    ', member.id, user.email
+                    emails = emails + ' ' + user.email
+                service.properties[u'recipients'] = emails
+
+                #service.active = False
+                #service.__setattr__('active', service.active)
+                service.__setattr__('recipients', service.properties[u'recipients'])
+                print '    ---->', service._updated_attrs
+                service.save()
+            project.save()
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return emails
+        
+def update_group_emails_onpush_list(git_lab, group_id = None):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    projects = None
+    try:
+        print function_name, group_id
+        if group_id == None:
+            projects = git_lab.projects.list(all=True)
+        else:
+            father_group = git_lab.groups.get(group_id)
+            ##################support subgroups
+            sub_groups = father_group.subgroups.list(all=True)
+            for sub_group in sub_groups:
+                update_group_emails_onpush_list(git_lab, sub_group.id)
+            ##################
+            projects = father_group.projects.list(all=True)
+        #print projects
+        for project in projects:
+            print '----------------'
+            print project.id, project.name, project.path, project.description
+            update_project_emails_onpush_list(git_lab, project.id)
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return projects
+        
 if "__main__" == __name__:
-    # if len(sys.argv) < 3:
-        # print 'Para error.'
-        # print 'Usage: dir_path template_pdf_path'
-        # sys.exit(-1)
+    if len(sys.argv) < 2:
+        print 'Para error.'
+        print 'Usage: cmd_type(0: for create projects, 1: for update projects email onpush list )'
+        sys.exit(-1)
     print '\n------------------------------The Start-----------------------------'
     start_time = time.clock()
     #####################################################
     url = r'https://192.168.19.105:8899'
-    token = 'e7GayRAoKCrps1ojVYX5'
+    #token = 'e7GayRAoKCrps1ojVYX5' #xiaodongzhang1025@163.com
+    token = 'w5u26Aw8Gu4U2v7kcNKN' #root
     try:
         session = requests.Session()
         session.verify = False
         #session.cert = ('/path/to/client.cert', '/path/to/client.key')
         git_lab = gitlab.Gitlab(url, token, api_version=4, session=session)
-        #projects = git_lab.projects.list(all=True)
-        #print projects
-        #list_groups(git_lab)
-        #list_projects(git_lab)
-        #delete_project_by_name_path(git_lab, 'gitlab_api_project_test', 'gitlab_api_project_test')
-        #delete_group_by_name_path(git_lab, 'gitlab_api_subgroup_test', 'gitlab_api_subgroup_test')
-        delete_group_by_name_path(git_lab, 'gitlab_api_group_test', 'gitlab_api_group_test')
-        #######################create group
-        group_id = create_group(git_lab, 'gitlab_api_group_test', 'gitlab_api_group_test', 'gitlab_api_group_test desc')
-        if group_id == None:
-            print 'create_group failed\n'
-            sys.exit(-1)
-        #######################create project in a group
-        DOMTree = xml.dom.minidom.parse("manifest.xml")
-        elementobj = DOMTree.documentElement
-        subElementObjs = elementobj.getElementsByTagName("project")
-        for i, subElementObj in enumerate(subElementObjs):
-            project_name = subElementObj.getAttribute("name")
-            project_path = subElementObj.getAttribute("path")
+        if sys.argv[1] == '0':
+            #projects = git_lab.projects.list(all=True)
+            #print projects
+            #list_groups(git_lab)
+            #list_projects(git_lab)
+            #delete_project_by_name_path(git_lab, 'gitlab_api_project_test', 'gitlab_api_project_test')
+            #delete_group_by_name_path(git_lab, 'gitlab_api_subgroup_test', 'gitlab_api_subgroup_test')
+            delete_group_by_name_path(git_lab, 'gitlab_api_group_test', 'gitlab_api_group_test')
+            #######################create group
+            group_id = create_group(git_lab, 'gitlab_api_group_test', 'gitlab_api_group_test', 'gitlab_api_group_test desc')
+            if group_id == None:
+                print 'create_group failed\n'
+                sys.exit(-1)
+            #######################create project in a group
+            DOMTree = xml.dom.minidom.parse("manifest.xml")
+            elementobj = DOMTree.documentElement
+            subElementObjs = elementobj.getElementsByTagName("project")
+            for i, subElementObj in enumerate(subElementObjs):
+                project_name = subElementObj.getAttribute("name")
+                project_path = subElementObj.getAttribute("path")
             
-            ##manifest.xml
-            project_name = project_path
-            print 'project info:', project_name, project_path
-            super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
+                ##manifest.xml
+                project_name = project_path
+                print 'project info:', project_name, project_path
+                super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
+        else:
+            #update_project_emails_onpush_list(git_lab, 323) #xiaodong project
+            update_group_emails_onpush_list(git_lab, 237) #xiaodong group
     except Exception, err:
         #print err
         print '===> Exception'
