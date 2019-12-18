@@ -493,9 +493,13 @@ if "__main__" == __name__:
     print '\n------------------------------The Start-----------------------------'
     start_time = time.clock()
     #####################################################
-    url = r'https://192.168.19.105:8899'
-    #token = 'e7GayRAoKCrps1ojVYX5' #xiaodongzhang1025@163.com
-    token = 'w5u26Aw8Gu4U2v7kcNKN' #root
+    #url = r'https://192.168.19.105:8899'
+    #token = 'e7GayRAoKCrps1ojVYX5' #105 xiaodongzhang1025@163.com
+    #token = 'w5u26Aw8Gu4U2v7kcNKN' #105 root
+    
+    url = r'http://192.168.19.141'
+    token = 'AB4NKyVwhwVAgGc-nE7z' #141 root
+    
     try:
         session = requests.Session()
         session.verify = False
@@ -528,7 +532,7 @@ if "__main__" == __name__:
                 super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
         else:
             #update_project_emails_onpush_list(git_lab, 323) #xiaodong project
-            update_group_emails_onpush_list(git_lab, 237) #xiaodong group
+            update_group_emails_onpush_list(git_lab, 125) #xiaodong group
     except Exception, err:
         #print err
         print '===> Exception'
