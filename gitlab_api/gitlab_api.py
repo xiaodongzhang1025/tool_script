@@ -485,6 +485,59 @@ def update_group_emails_onpush_list(git_lab, group_id = None):
         #print '===> Finally'
         return projects
         
+        
+def project_branches_protect_crtl(git_lab, protect_ctrl, project_id):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    try:
+        branches = ''
+        project = git_lab.projects.get(project_id)
+        if project:
+            print function_name, 'find the project [%d]'%project.id
+            project_branches = project.branches.list()
+            #print project_branches
+            for project_branch in project_branches:
+                #print function_name, project_branch
+                if protect_ctrl == 'protect':
+                    project_branch.protect()
+                else:
+                    project_branch.unprotect()
+            project.save()
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return branches
+    
+def group_branches_protect_crtl(git_lab, protect_ctrl, group_id = None):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    projects = None
+    try:
+        print function_name, group_id
+        if group_id == None:
+            projects = git_lab.projects.list(all=True)
+        else:
+            father_group = git_lab.groups.get(group_id)
+            ##################support subgroups
+            sub_groups = father_group.subgroups.list(all=True)
+            for sub_group in sub_groups:
+                group_branches_protect_crtl(git_lab, protect_ctrl, sub_group.id)
+            ##################
+            projects = father_group.projects.list(all=True)
+        #print projects
+        for project in projects:
+            print '----------------'
+            print project.id, project.name, project.path, project.description
+            project_branches_protect_crtl(git_lab, protect_ctrl, project.id)
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return projects
+        
 if "__main__" == __name__:
     if len(sys.argv) < 2:
         print 'Para error.'
@@ -530,18 +583,24 @@ if "__main__" == __name__:
                 project_name = project_path
                 print 'project info:', project_name, project_path
                 super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
+        elif sys.argv[1] == '1':
+            #update_project_emails_onpush_list(git_lab, 146) #xiaodong project
+            update_group_emails_onpush_list(git_lab, 126) #xiaodong group
+        elif sys.argv[1] == '2':
+            group_branches_protect_crtl(git_lab, 'unprotect', 126) #xiaodong group
+        elif sys.argv[1] == '3':
+            group_branches_protect_crtl(git_lab, 'protect', 126) #xiaodong group
         else:
-            #update_project_emails_onpush_list(git_lab, 323) #xiaodong project
-            update_group_emails_onpush_list(git_lab, 125) #xiaodong group
+            print 'unsupported cmd_type!!!'
     except Exception, err:
         #print err
         print '===> Exception'
         print str(err).decode("string_escape")
     finally:
         #print '===> Finally'
-        print 'your url and token info:', url, token
+        print '\n\nyour url and token info:', url, token
     #####################################################
-    print '\n------------------------------The   End-----------------------------'
+    print '------------------------------The   End-----------------------------'
     end_time = time.clock()
     print 'Time used %s senconds'%(end_time - start_time)
     sys.exit(0)
