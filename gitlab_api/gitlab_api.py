@@ -28,7 +28,7 @@ gitlab.OWNER_ACCESS = 50
 
 def simple_test():
     function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
-    url = r'https://192.168.19.105:8899/api/v4/projects?private_token=e7GayRAoKCrps1ojVYX5'
+    url = r'https://192.168.19.90:8899/api/v4/projects?private_token=e7GayRAoKCrps1ojVYX5'
     try:
         print function_name
         ret = requests.get(url, verify = False)
@@ -485,6 +485,71 @@ def update_group_emails_onpush_list(git_lab, group_id = None):
         #print '===> Finally'
         return projects
         
+def update_project_emails_onpush_ctrl_codediffs(git_lab, ctrl, project_id):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    try:
+        emails = ''
+        project = git_lab.projects.get(project_id)
+        if project:
+            print function_name, 'find the project [%d]'%project.id
+            project_services = project.services
+            #print dir(project_services)
+            #print project_services
+            if project_services:
+                print '    service [Emails on push]===>'
+                service = project_services.get('emails-on-push')
+
+                attributes = service.attributes
+                #properties = attributes['properties']
+                properties = service.properties
+                #print attributes
+                #print properties
+                #service.active = False
+                #service.__setattr__('active', service.active)
+                if ctrl == True:
+                    service.properties[u'disable_diffs'] = u'1'
+                else:
+                    service.properties[u'disable_diffs'] = u'0'
+                service.__setattr__('disable_diffs', service.properties[u'disable_diffs'])
+                service.__setattr__('recipients', service.properties[u'recipients'])
+                print '    ---->', service._updated_attrs
+                service.save()
+            project.save()
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return emails
+        
+def update_group_emails_onpush_ctrl_codediffs(git_lab, ctrl, group_id = None):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    projects = None
+    try:
+        print function_name, group_id
+        if group_id == None:
+            projects = git_lab.projects.list(all=True)
+        else:
+            father_group = git_lab.groups.get(group_id)
+            ##################support subgroups
+            sub_groups = father_group.subgroups.list(all=True)
+            for sub_group in sub_groups:
+                update_group_emails_onpush_ctrl_codediffs(git_lab, ctrl, sub_group.id)
+            ##################
+            projects = father_group.projects.list(all=True)
+        #print projects
+        for project in projects:
+            print '----------------'
+            print project.id, project.name, project.path, project.description
+            update_project_emails_onpush_ctrl_codediffs(git_lab, ctrl, project.id)
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return projects
         
 def project_branches_protect_crtl(git_lab, protect_ctrl, project_id):
     function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
@@ -546,13 +611,12 @@ if "__main__" == __name__:
     print '\n------------------------------The Start-----------------------------'
     start_time = time.clock()
     #####################################################
-    #url = r'https://192.168.19.105:8899'
-    #token = 'e7GayRAoKCrps1ojVYX5' #105 xiaodongzhang1025@163.com
-    #token = 'w5u26Aw8Gu4U2v7kcNKN' #105 root
-    
-    url = r'http://192.168.19.141'
-    token = 'AB4NKyVwhwVAgGc-nE7z' #141 root
-    
+
+    #url = r'http://192.168.19.141'
+    url = r'https://192.168.19.90:8899'
+    #token = 'e7GayRAoKCrps1ojVYX5' #xiaodongzhang1025@163.com
+    #token = 'AB4NKyVwhwVAgGc-nE7z' #root of 19.141
+    token = 'w5u26Aw8Gu4U2v7kcNKN' #root of 19.90
     try:
         session = requests.Session()
         session.verify = False
@@ -587,9 +651,12 @@ if "__main__" == __name__:
             #update_project_emails_onpush_list(git_lab, 146) #xiaodong project
             update_group_emails_onpush_list(git_lab, 126) #xiaodong group
         elif sys.argv[1] == '2':
-            group_branches_protect_crtl(git_lab, 'unprotect', 126) #xiaodong group
+            group_branches_protect_crtl(git_lab, 'unprotect',  219) #xiaodong group
         elif sys.argv[1] == '3':
-            group_branches_protect_crtl(git_lab, 'protect', 126) #xiaodong group
+            group_branches_protect_crtl(git_lab, 'protect',  219) #xiaodong group
+        elif sys.argv[1] == '4':
+            #update_project_emails_onpush_ctrl_codediffs(git_lab, False, 357)
+            update_group_emails_onpush_ctrl_codediffs(git_lab, True, 111) ###111 for AW_SDK
         else:
             print 'unsupported cmd_type!!!'
     except Exception, err:
