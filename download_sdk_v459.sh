@@ -7,6 +7,6 @@ if [ -e "$1" ];then
 fi
 cur_path=`pwd`
 mkdir -p "$1"
-cd "$1" && repo init -u git@192.168.19.105:AW_SDK/manifest.git -b master -m V459_IPC.xml
+cd "$1" && repo init -u git@192.168.19.90:AW_SDK/manifest.git -b master -m V459_IPC.xml
 cd $cur_path
 echo "----------------The End---------------"
