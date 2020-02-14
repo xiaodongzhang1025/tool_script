@@ -415,6 +415,53 @@ def create_project(git_lab, project_name, project_path, project_desc, father_gro
         time.sleep(2)
         return project_id
         
+def delete_user(git_lab, user_name):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    user_id = 0
+    try:
+        print function_name, user_name
+        
+        users = git_lab.users.list(username = user_name)
+        if users:
+            user = users[0]
+            print user
+            user_id = user.id
+            print user.id, user.name, user.email
+            git_lab.users.delete(user_id)
+        
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        time.sleep(2)
+        return user_id
+    
+def create_user(git_lab, user_name, user_email, user_passwd, can_create_group = False):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    user_id = 0
+    try:
+        print function_name, user_name, user_email, user_passwd, can_create_group
+        
+        user = git_lab.users.create({'email': user_email,
+                                    'password': user_passwd,
+                                    'username': user_name,
+                                    'name': user_name,
+                                    'can_create_group': can_create_group})
+                                    
+        user.save()
+        print user
+        user_id = user.id
+        print user.id, user.name, user.email
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        time.sleep(2)
+        return user_id
         
 def update_project_emails_onpush_list(git_lab, project_id):
     function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
@@ -439,7 +486,7 @@ def update_project_emails_onpush_list(git_lab, project_id):
                     #print member
                     #print dir(member)
                     user = git_lab.users.get(member.id)
-                    print '    ', member.id, user.email
+                    print '    ', member.id, user.name, user.email
                     emails = emails + ' ' + user.email
                 service.properties[u'recipients'] = emails
 
@@ -606,17 +653,24 @@ def group_branches_protect_crtl(git_lab, protect_ctrl, group_id = None):
 if "__main__" == __name__:
     if len(sys.argv) < 2:
         print 'Para error.'
-        print 'Usage: cmd_type(0: for create projects, 1: for update projects email onpush list )'
+        print '''Usage: cmd_type
+    0: create projects
+    1: update projects email onpush list
+    2: branches_protect_crtl unprotect
+    3: branches_protect_crtl protect
+    4: emails_onpush_ctrl_codediffs
+    5: create user
+    '''
         sys.exit(-1)
     print '\n------------------------------The Start-----------------------------'
     start_time = time.clock()
     #####################################################
 
-    #url = r'http://192.168.19.141'
-    url = r'https://192.168.19.90:8899'
+    url = r'http://192.168.19.141'
+    #url = r'https://192.168.19.90:8899'
     #token = 'e7GayRAoKCrps1ojVYX5' #xiaodongzhang1025@163.com
-    #token = 'AB4NKyVwhwVAgGc-nE7z' #root of 19.141
-    token = 'w5u26Aw8Gu4U2v7kcNKN' #root of 19.90
+    token = 'AB4NKyVwhwVAgGc-nE7z' #root of 19.141
+    #token = 'w5u26Aw8Gu4U2v7kcNKN' #root of 19.90
     try:
         session = requests.Session()
         session.verify = False
@@ -649,14 +703,23 @@ if "__main__" == __name__:
                 super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
         elif sys.argv[1] == '1':
             #update_project_emails_onpush_list(git_lab, 146) #xiaodong project
-            update_group_emails_onpush_list(git_lab, 126) #xiaodong group
+            update_group_emails_onpush_list(git_lab, 61) #QG2101 
         elif sys.argv[1] == '2':
-            group_branches_protect_crtl(git_lab, 'unprotect',  219) #xiaodong group
+            group_branches_protect_crtl(git_lab, 'unprotect',  61) #QG2101 
         elif sys.argv[1] == '3':
-            group_branches_protect_crtl(git_lab, 'protect',  219) #xiaodong group
+            group_branches_protect_crtl(git_lab, 'protect',  61) #QG2101 
         elif sys.argv[1] == '4':
             #update_project_emails_onpush_ctrl_codediffs(git_lab, False, 357)
-            update_group_emails_onpush_ctrl_codediffs(git_lab, True, 111) ###111 for AW_SDK
+            update_group_emails_onpush_ctrl_codediffs(git_lab, True, 61) ###111 for AW_SDK
+        elif sys.argv[1] == '5':
+            delete_user(git_lab, 'test_username')
+            user_id = create_user(git_lab, 'test_username', '335920284@qq.com', '1qaz2wsx3edc', can_create_group = False)
+            
+            group = git_lab.groups.get(61)
+            member = group.members.create({'user_id': user_id, 'access_level': gitlab.GUEST_ACCESS})
+            
+            #project = git_lab.projects.get(61)
+            #member = project.members.create({'user_id': user_id, 'access_level': gitlab.GUEST_ACCESS})
         else:
             print 'unsupported cmd_type!!!'
     except Exception, err:
