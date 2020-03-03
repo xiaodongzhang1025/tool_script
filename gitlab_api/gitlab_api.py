@@ -28,7 +28,7 @@ gitlab.OWNER_ACCESS = 50
 
 def simple_test():
     function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
-    url = r'https://192.168.19.105:8899/api/v4/projects?private_token=e7GayRAoKCrps1ojVYX5'
+    url = r'https://192.168.19.90:8899/api/v4/projects?private_token=e7GayRAoKCrps1ojVYX5'
     try:
         print function_name
         ret = requests.get(url, verify = False)
@@ -415,6 +415,53 @@ def create_project(git_lab, project_name, project_path, project_desc, father_gro
         time.sleep(2)
         return project_id
         
+def delete_user(git_lab, user_name):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    user_id = 0
+    try:
+        print function_name, user_name
+        
+        users = git_lab.users.list(username = user_name)
+        if users:
+            user = users[0]
+            print user
+            user_id = user.id
+            print user.id, user.name, user.email
+            git_lab.users.delete(user_id)
+        
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        time.sleep(2)
+        return user_id
+    
+def create_user(git_lab, user_name, user_email, user_passwd, can_create_group = False):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    user_id = 0
+    try:
+        print function_name, user_name, user_email, user_passwd, can_create_group
+        
+        user = git_lab.users.create({'email': user_email,
+                                    'password': user_passwd,
+                                    'username': user_name,
+                                    'name': user_name,
+                                    'can_create_group': can_create_group})
+                                    
+        user.save()
+        print user
+        user_id = user.id
+        print user.id, user.name, user.email
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        time.sleep(2)
+        return user_id
         
 def update_project_emails_onpush_list(git_lab, project_id):
     function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
@@ -439,7 +486,7 @@ def update_project_emails_onpush_list(git_lab, project_id):
                     #print member
                     #print dir(member)
                     user = git_lab.users.get(member.id)
-                    print '    ', member.id, user.email
+                    print '    ', member.id, user.name, user.email
                     emails = emails + ' ' + user.email
                 service.properties[u'recipients'] = emails
 
@@ -485,17 +532,145 @@ def update_group_emails_onpush_list(git_lab, group_id = None):
         #print '===> Finally'
         return projects
         
+def update_project_emails_onpush_ctrl_codediffs(git_lab, ctrl, project_id):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    try:
+        emails = ''
+        project = git_lab.projects.get(project_id)
+        if project:
+            print function_name, 'find the project [%d]'%project.id
+            project_services = project.services
+            #print dir(project_services)
+            #print project_services
+            if project_services:
+                print '    service [Emails on push]===>'
+                service = project_services.get('emails-on-push')
+
+                attributes = service.attributes
+                #properties = attributes['properties']
+                properties = service.properties
+                #print attributes
+                #print properties
+                #service.active = False
+                #service.__setattr__('active', service.active)
+                if ctrl == True:
+                    service.properties[u'disable_diffs'] = u'1'
+                else:
+                    service.properties[u'disable_diffs'] = u'0'
+                service.__setattr__('disable_diffs', service.properties[u'disable_diffs'])
+                service.__setattr__('recipients', service.properties[u'recipients'])
+                print '    ---->', service._updated_attrs
+                service.save()
+            project.save()
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return emails
+        
+def update_group_emails_onpush_ctrl_codediffs(git_lab, ctrl, group_id = None):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    projects = None
+    try:
+        print function_name, group_id
+        if group_id == None:
+            projects = git_lab.projects.list(all=True)
+        else:
+            father_group = git_lab.groups.get(group_id)
+            ##################support subgroups
+            sub_groups = father_group.subgroups.list(all=True)
+            for sub_group in sub_groups:
+                update_group_emails_onpush_ctrl_codediffs(git_lab, ctrl, sub_group.id)
+            ##################
+            projects = father_group.projects.list(all=True)
+        #print projects
+        for project in projects:
+            print '----------------'
+            print project.id, project.name, project.path, project.description
+            update_project_emails_onpush_ctrl_codediffs(git_lab, ctrl, project.id)
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return projects
+        
+def project_branches_protect_crtl(git_lab, protect_ctrl, project_id):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    try:
+        branches = ''
+        project = git_lab.projects.get(project_id)
+        if project:
+            print function_name, 'find the project [%d]'%project.id
+            project_branches = project.branches.list()
+            #print project_branches
+            for project_branch in project_branches:
+                #print function_name, project_branch
+                if protect_ctrl == 'protect':
+                    project_branch.protect()
+                else:
+                    project_branch.unprotect()
+            project.save()
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return branches
+    
+def group_branches_protect_crtl(git_lab, protect_ctrl, group_id = None):
+    function_name = '---> %s\n     '%( sys._getframe().f_code.co_name)
+    projects = None
+    try:
+        print function_name, group_id
+        if group_id == None:
+            projects = git_lab.projects.list(all=True)
+        else:
+            father_group = git_lab.groups.get(group_id)
+            ##################support subgroups
+            sub_groups = father_group.subgroups.list(all=True)
+            for sub_group in sub_groups:
+                group_branches_protect_crtl(git_lab, protect_ctrl, sub_group.id)
+            ##################
+            projects = father_group.projects.list(all=True)
+        #print projects
+        for project in projects:
+            print '----------------'
+            print project.id, project.name, project.path, project.description
+            project_branches_protect_crtl(git_lab, protect_ctrl, project.id)
+    except Exception, err:
+        #print err
+        print '===> Exception'
+        print str(err).decode("string_escape")
+    finally:
+        #print '===> Finally'
+        return projects
+        
 if "__main__" == __name__:
     if len(sys.argv) < 2:
         print 'Para error.'
-        print 'Usage: cmd_type(0: for create projects, 1: for update projects email onpush list )'
+        print '''Usage: cmd_type
+    0: create projects
+    1: update projects email onpush list
+    2: branches_protect_crtl unprotect
+    3: branches_protect_crtl protect
+    4: emails_onpush_ctrl_codediffs
+    5: create user
+    '''
         sys.exit(-1)
     print '\n------------------------------The Start-----------------------------'
     start_time = time.clock()
     #####################################################
-    url = r'https://192.168.19.105:8899'
+
+    url = r'http://192.168.19.141'
+    #url = r'https://192.168.19.90:8899'
     #token = 'e7GayRAoKCrps1ojVYX5' #xiaodongzhang1025@163.com
-    token = 'w5u26Aw8Gu4U2v7kcNKN' #root
+    token = 'AB4NKyVwhwVAgGc-nE7z' #root of 19.141
+    #token = 'w5u26Aw8Gu4U2v7kcNKN' #root of 19.90
     try:
         session = requests.Session()
         session.verify = False
@@ -526,18 +701,36 @@ if "__main__" == __name__:
                 project_name = project_path
                 print 'project info:', project_name, project_path
                 super_create_project_by_name_path(git_lab, project_name, project_path, father_group_id = group_id)
+        elif sys.argv[1] == '1':
+            #update_project_emails_onpush_list(git_lab, 146) #xiaodong project
+            update_group_emails_onpush_list(git_lab, 61) #QG2101 
+        elif sys.argv[1] == '2':
+            group_branches_protect_crtl(git_lab, 'unprotect',  61) #QG2101 
+        elif sys.argv[1] == '3':
+            group_branches_protect_crtl(git_lab, 'protect',  61) #QG2101 
+        elif sys.argv[1] == '4':
+            #update_project_emails_onpush_ctrl_codediffs(git_lab, False, 357)
+            update_group_emails_onpush_ctrl_codediffs(git_lab, True, 61) ###111 for AW_SDK
+        elif sys.argv[1] == '5':
+            delete_user(git_lab, 'test_username')
+            user_id = create_user(git_lab, 'test_username', '335920284@qq.com', '1qaz2wsx3edc', can_create_group = False)
+            
+            group = git_lab.groups.get(61)
+            member = group.members.create({'user_id': user_id, 'access_level': gitlab.GUEST_ACCESS})
+            
+            #project = git_lab.projects.get(61)
+            #member = project.members.create({'user_id': user_id, 'access_level': gitlab.GUEST_ACCESS})
         else:
-            #update_project_emails_onpush_list(git_lab, 323) #xiaodong project
-            update_group_emails_onpush_list(git_lab, 237) #xiaodong group
+            print 'unsupported cmd_type!!!'
     except Exception, err:
         #print err
         print '===> Exception'
         print str(err).decode("string_escape")
     finally:
         #print '===> Finally'
-        print 'your url and token info:', url, token
+        print '\n\nyour url and token info:', url, token
     #####################################################
-    print '\n------------------------------The   End-----------------------------'
+    print '------------------------------The   End-----------------------------'
     end_time = time.clock()
     print 'Time used %s senconds'%(end_time - start_time)
     sys.exit(0)
