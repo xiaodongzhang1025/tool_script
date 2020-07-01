@@ -48,9 +48,12 @@ do
 done <<< "$TARGET_OBJS"
 
 if [ ! -z "$TARGET_OBJS" ];then
-  echo "TARGET_OBJS    B $objs_text_size $objs_data_size $objs_bss_size"
-  echo "              KB `echo "scale=2; $objs_text_size/1024" | bc` `echo "scale=2; $objs_data_size/1024" | bc` `echo "scale=2; $objs_bss_size/1024" | bc`"
-  echo "              MB `echo "scale=2; $objs_text_size/1024/1024" | bc` `echo "scale=2; $objs_data_size/1024/1024" | bc` `echo "scale=2; $objs_bss_size/1024/1024" | bc`"
+  #echo "TARGET_OBJS    B $objs_text_size  $objs_data_size  $objs_bss_size"
+  #echo "              KB `echo "scale=2; $objs_text_size/1024" | bc` `echo "scale=2; $objs_data_size/1024" | bc` `echo "scale=2; $objs_bss_size/1024" | bc`"
+  #echo "              MB `echo "scale=2; $objs_text_size/1024/1024" | bc` `echo "scale=2; $objs_data_size/1024/1024" | bc` `echo "scale=2; $objs_bss_size/1024/1024" | bc`"
+  printf "TARGET_OBJS    B %-4d  %-4d  %-4d\n" $((objs_text_size/1))  $((objs_data_size/1))  $((objs_bss_size/1))
+  printf "              KB %-4.2f  %-4.2f  %-4.2f \n" $((objs_text_size/1024))  $((objs_data_size/1024))  $((objs_bss_size/1024))
+  printf "              KB %-4.2f  %-4.2f  %-4.2f \n" $((objs_text_size/1024/1024))  $((objs_data_size/1024/1024))  $((objs_bss_size/1024/1024))
 fi
 #echo ""
 #echo "TARGET_LIBS-------------------"
@@ -90,9 +93,12 @@ do
   libs_bss_size=$(($libs_bss_size+$tmp_bss_size))
 done <<< "$TARGET_LIBS"
 if [ ! -z "$TARGET_LIBS" ];then
-  echo "TARGET_LIBS    B $libs_text_size $libs_data_size $libs_bss_size"
-  echo "              KB `echo "scale=2; $libs_text_size/1024" | bc` `echo "scale=2; $libs_data_size/1024" | bc` `echo "scale=2; $libs_bss_size/1024" | bc`"
-  echo "              MB `echo "scale=2; $libs_text_size/1024/1024" | bc` `echo "scale=2; $libs_data_size/1024/1024" | bc` `echo "scale=2; $libs_bss_size/1024/1024" | bc`"
+  #echo "TARGET_LIBS    B $libs_text_size $libs_data_size $libs_bss_size"
+  #echo "              KB `echo "scale=2; $libs_text_size/1024" | bc` `echo "scale=2; $libs_data_size/1024" | bc` `echo "scale=2; $libs_bss_size/1024" | bc`"
+  #echo "              MB `echo "scale=2; $libs_text_size/1024/1024" | bc` `echo "scale=2; $libs_data_size/1024/1024" | bc` `echo "scale=2; $libs_bss_size/1024/1024" | bc`"
+  printf "TARGET_LIBS    B %-d  %-d  %-d\n" $((libs_text_size/1))  $((libs_data_size/1))  $((libs_bss_size/1))
+  printf "              KB %-.2f  %-.2f  %-.2f \n" $((libs_text_size/1024))  $((libs_data_size/1024))  $((libs_bss_size/1024))
+  printf "              KB %-.2f  %-.2f  %-.2f \n" $((libs_text_size/1024/1024))  $((libs_data_size/1024/1024))  $((libs_bss_size/1024/1024))
 fi
 echo '-----------------The End-----------------'
 cd $CUR_DIR
